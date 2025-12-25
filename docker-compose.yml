@@ -5,14 +5,8 @@ services:
       dockerfile: ./Dockerfile.dev
     volumes:
       - .:/workspace
-      - go-mod-cache:/go/pkg/mod
-      - go-build-cache:/go/.cache/go-build
     ports:
-      - "1313:1313"
+      - "3000:3000"
     stdin_open: true
     tty: true
     working_dir: /workspace
-
-volumes:
-  go-build-cache:
-  go-mod-cache:

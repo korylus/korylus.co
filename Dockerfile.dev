@@ -1,4 +1,4 @@
-FROM golang:1.25.1-trixie
+FROM debian:trixie-slim
 
 ARG USER_ID=1000
 ARG GROUP_ID=1000
@@ -10,6 +10,7 @@ apt dist-upgrade -yq
 
 PACKAGES=$(cat <<'PKGLIST' | sed 's/#.*//'
   build-essential
+  ca-certificates         # Node.jsのインストールに必要
   curl
   fzf                     # Claude Codeで使用
   git                     # Claude Codeで使用
@@ -36,9 +37,6 @@ RUN \
     useradd -u ${USER_ID} -g ${GROUP_ID} -m -s /bin/bash ${USERNAME} && \
     echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-RUN mkdir -p /go/.cache/go-build /go/pkg && \
-    chown -R ${USER_ID}:${GROUP_ID} /go
-
 WORKDIR /workspace
 
 USER ${USERNAME}
@@ -51,12 +49,7 @@ RUN npm install -g pnpm@10.26.1
 RUN npm install -g @anthropic-ai/claude-code@latest
 RUN npm install -g @modelcontextprotocol/server-filesystem
 
-RUN go install github.com/gohugoio/hugo@latest
-
-ENV GOCACHE=/go/.cache/go-build
-ENV GOMODCACHE=/go/pkg/mod
-
-EXPOSE 1313
+EXPOSE 3000
 
 # zshをデフォルトシェルに設定
 SHELL ["/bin/zsh", "-c"]
